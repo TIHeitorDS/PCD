@@ -4,25 +4,29 @@
 
 int main(int argc, char* argv[]) {
     if (argc < 3) {
-        printf("Insira três argumentos!");
+        printf("Insira três argumentos!\n");
         exit(1);
     }
 
     int n;
     int thread_count;
 
-    i = strtol(argv[1], NULL, 10);
+    n = strtol(argv[1], NULL, 10);
     thread_count = strtol(argv[2], NULL, 10);
 
-    #pragma omp parallel num_threads(thread_count) {
+    #pragma omp parallel num_threads(thread_count)
+    {
         int my_rank = omp_get_thread_num();
-        printf("Thread %d: Iteracoes ", omp_get_thread_num());
+        int start = -1, end = -1;
 
         #pragma omp for
         for (int i = 0; i < n; i++) {
-            printf("%d -- %d", i, i + 1);
+            if (start == -1) start = i;
+            end = i;
         }
+
+        printf("Thread %d: Iterações %d -- %d\n", my_rank, start, end);
     }
 
-    return 1;
+    return 0;
 }
