@@ -10,10 +10,14 @@ void Count_sort_parallel(int a[], int n,int thread_count);
 int main(int argc, char* argv[]) {
     int a[] = {1, 1, 4, 6, 7, 1, 6, 9, 10, 11, 2};
     int n = 11;
+    int thread_count;
 
-    // if (argc != 1) exit(1);
+    if (argc < 2) {
+        fprintf(stderr, "Usage: %s <number_of_threads>\n", argv[0]);
+        exit(EXIT_FAILURE);
+    }
 
-    int thread_count = strtol(argv[1], NULL, 10);
+    thread_count = strtol(argv[1], NULL, 10);
 
     Count_sort_parallel(a, n, thread_count);
 
@@ -29,15 +33,16 @@ int main(int argc, char* argv[]) {
 void Count_sort(int a[], int n) {
     int i, j, count;
     int* temp = malloc(n*sizeof(int));
-        for (i = 0; i < n; i++) {
-            count = 0;
-            for (j = 0; j < n; j++) {
-                if (a[j] < a [i])
-                    count++;
-                else if (a[j] == a[i] && j < i)
-                    count++;
-            }
-            temp[count] = a[i];
+    
+    for (i = 0; i < n; i++) {
+        count = 0;
+        for (j = 0; j < n; j++) {
+            if (a[j] < a [i])
+                count++;
+            else if (a[j] == a[i] && j < i)
+                count++;
+        }
+        temp[count] = a[i];
     }
 
     memcpy(a, temp, n*sizeof(int));
@@ -49,16 +54,16 @@ void Count_sort_parallel(int a[], int n, int thread_count) {
     int* temp = malloc(n*sizeof(int));
 
     # pragma omp parallel for num_threads(thread_count) private(i, j, count) shared(temp, a, n)
-        for (i = 0; i < n; i++) {
-            count = 0;
-            for (j = 0; j < n; j++) {
-                if (a[j] < a [i])
-                    count++;
-                else if (a[j] == a[i] && j < i)
-                    count++;
-            }
-            temp[count] = a[i];
-    }
+    for (i = 0; i < n; i++) {
+        count = 0;
+        for (j = 0; j < n; j++) {
+            if (a[j] < a [i])
+                count++;
+            else if (a[j] == a[i] && j < i)
+                count++;
+        }
+        temp[count] = a[i];
+    } 
 
     # pragma omp parallel num_threads(thread_count)
     {
